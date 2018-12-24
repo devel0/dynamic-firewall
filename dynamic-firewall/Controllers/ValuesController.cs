@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace dynamic_firewall.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]/[action]")]
     [ApiController]
     public class ValuesController : ControllerBase
     {
