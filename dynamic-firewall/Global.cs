@@ -51,10 +51,10 @@ namespace dynamic_firewall
             Config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(Config.Pathfilename));
 
             thExpiredTokenManager = new Thread(() =>
-            {
-                var dtnow = DateTime.Now;
+            {                
                 while (true)
                 {
+                    var dtnow = DateTime.Now;
                     lock (lckTokenStarted)
                     {
                         var q = tokenStarted.Where(r => (dtnow - r.dtStart).TotalMinutes >= r.validToken.ExpireMinutes).ToList();
