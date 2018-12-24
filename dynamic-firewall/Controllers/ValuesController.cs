@@ -29,8 +29,9 @@ namespace dynamic_firewall.Controllers
                 var q = HttpContext.Request.Headers["X-Real-IP"];
                 var url = "";
                 if (q.Count > 0) url = q.First();
-
+                
                 System.Diagnostics.Process.Start("/sbin/ipset", $"add {qt.IPSetName} {url}");
+                System.Console.WriteLine($"added [{url}] to ipset [{qt.IPSetName}]");
 
                 global.RestartIpset(qt, url);   
 
@@ -60,6 +61,7 @@ namespace dynamic_firewall.Controllers
                 if (q.Count > 0) url = q.First();
 
                 System.Diagnostics.Process.Start("/sbin/ipset", $"del {qt.IPSetName} {url}");
+                System.Console.WriteLine($"removed [{url}] from ipset [{qt.IPSetName}]");
 
                 return Content($"<html><h1>dynamic firewall</h1>" +
                     $"from url=[{url}]<br/>" +
