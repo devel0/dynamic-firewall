@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +16,8 @@ namespace dynamic_firewall.Controllers
 
         Config config { get { return global.Config; } }
 
+        static Dictionary<string, Thread> tokenThreads = new Dictionary<string, Thread>();
+
         [HttpGet("{token}")]
         public ContentResult enable(string token)
         {
@@ -28,6 +31,8 @@ namespace dynamic_firewall.Controllers
                 if (q.Count > 0) url = q.First();
 
                 System.Diagnostics.Process.Start("/sbin/ipset", $"add {qt.IPSetName} {url}");
+
+                global.RestartIpset(qt, url);   
 
                 return Content($"<html><h1>dynamic firewall</h1>" +
                     $"from url=[{url}]<br/>" +
