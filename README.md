@@ -26,7 +26,7 @@ dynamic firewall using iptables and ipset
 
 ## how it works
 
-- [firewall](https://github.com/devel0/linux-scripts-utils/blob/master/fw.sh) iptables can contains rules referring set of source or destination ip address in a dynamic way by using set that can change at runtime using `ipset` command without the need to remove,add or change any iptables existing rules
+- [firewall](https://github.com/devel0/linux-scripts-utils/blob/ba388ae1e5a0b158cdf83f7d067318b9caccf203/fw.sh) iptables can contains rules referring set of source or destination ip address in a dynamic way by using set that can change at runtime using `ipset` command without the need to remove,add or change any iptables existing rules
 - a listen process on http port 5000 serve /Values/enable and /Values/disable webapi ( nginx redirect https reverse proxy required for security reason )
 - [ipset references](https://www.linuxjournal.com/content/advanced-firewall-configurations-ipset)
 
