@@ -7,12 +7,16 @@ executing_dir()
 
 exdir="$(executing_dir)"
 
-PATH=$PATH:$DOTNET_ROOT
+DOTNET=/usr/bin/dotnet
+
+if [ ! -e $DOTNET ]; then
+	DOTNET=/opt/dotnet/dotnet
+fi
 
 dllpath="$exdir/dynamic-firewall/bin/Release/net6.0/dynamic-firewall.dll"
 
 if [ ! -e "$dllpath" ]; then
-	dotnet build dynamic-firewall -c Release
+	$DOTNET build dynamic-firewall -c Release
 fi
 
-dotnet "$dllpath"
+$DOTNET "$dllpath"
