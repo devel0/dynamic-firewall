@@ -7,4 +7,4 @@ executing_dir()
 
 exdir="$(executing_dir)"
 
-/usr/bin/dotnet "$exdir/dynamic-firewall/bin/Debug/netcoreapp2.1/dynamic-firewall.dll"
+$DOTNET_ROOT/dotnet "$exdir/dynamic-firewall/bin/Debug/net6.0/dynamic-firewall.dll"
