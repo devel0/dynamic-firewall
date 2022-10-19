@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading;
 using Newtonsoft.Json;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace dynamic_firewall
 {
@@ -25,7 +26,8 @@ namespace dynamic_firewall
 
         public Config Config { get; private set; }
 
-        Thread thExpiredTokenManager;
+        internal CancellationTokenSource ctsExpiredTokenManager = new CancellationTokenSource();
+        internal AutoResetEvent are = new AutoResetEvent(false);
 
         List<(ValidToken validToken, string ipaddress, DateTime dtStart)> tokenStarted =
             new List<(ValidToken validToken, string ipaddress, DateTime dtStart)>();
@@ -50,25 +52,40 @@ namespace dynamic_firewall
         {
             Config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(Config.Pathfilename));
 
-            thExpiredTokenManager = new Thread(() =>
-            {                
+            Task.Run(async () =>
+            {        
+                System.Console.WriteLine($"Expired token manager started");        
                 while (true)
                 {
-                    var dtnow = DateTime.Now;
-                    lock (lckTokenStarted)
+                    try
                     {
-                        var q = tokenStarted.Where(r => (dtnow - r.dtStart).TotalMinutes >= r.validToken.ExpireMinutes).ToList();
-                        foreach (var x in q)
+                        if (ctsExpiredTokenManager.IsCancellationRequested) 
                         {
-                            System.Console.WriteLine($"removing ipaddr [{x.ipaddress}] from set [{x.validToken.IPSetName}]");
-                            System.Diagnostics.Process.Start("/sbin/ipset", $"del {x.validToken.IPSetName} {x.ipaddress}");
-                            tokenStarted.Remove(x);
+                            System.Console.WriteLine($"stop dynfw requested");
+                            break;
                         }
+                        var dtnow = DateTime.Now;
+                        lock (lckTokenStarted)
+                        {
+                            var q = tokenStarted.Where(r => (dtnow - r.dtStart).TotalMinutes >= r.validToken.ExpireMinutes).ToList();
+                            foreach (var x in q)
+                            {
+                                System.Console.WriteLine($"removing ipaddr [{x.ipaddress}] from set [{x.validToken.IPSetName}]");
+                                System.Diagnostics.Process.Start("/sbin/ipset", $"del {x.validToken.IPSetName} {x.ipaddress}");
+                                tokenStarted.Remove(x);
+                            }
+                        }
+                        await Task.Delay(5000, ctsExpiredTokenManager.Token);
+                    } 
+                    catch (TaskCanceledException)
+                    {                    
+                        // cancel during Task.Delay happened    
                     }
-                    Thread.Sleep(5000);
+
                 }
-            });
-            thExpiredTokenManager.Start();
+
+                are.Set(); // notify ApplicationStopping to continue shutdown
+            }, ctsExpiredTokenManager.Token);            
         }
 
     }

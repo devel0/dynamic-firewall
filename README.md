@@ -26,15 +26,19 @@ dynamic firewall using iptables and ipset
 
 ## how it works
 
-- [firewall](https://github.com/devel0/linux-scripts-utils/blob/ba388ae1e5a0b158cdf83f7d067318b9caccf203/fw.sh) iptables can contains rules referring set of source or destination ip address in a dynamic way by using set that can change at runtime using `ipset` command without the need to remove,add or change any iptables existing rules
+- [firewall](https://github.com/devel0/linux-scripts-utils/blob/ba388ae1e5a0b158cdf83f7d067318b9caccf203/fw.sh) iptables can contains rules referring set of source or destination ip address in a dynamic way by using set that can change at runtime using `ipset` command without the need to remove,add or change any iptables existing rules. To create a ip set issue
+
+```sh
+ipset -N my_allowed iphash
+```
 
 example rule for blocked ips
-```
+```sh
 drop INPUT-2 -m set --match-set blocked_ips src
 ```
 
 example rule for allowed ips
-```
+```sh
 accept INPUT-2 -i $if_wan -m set --match-set support_allowed src -p tcp --dport $svc_ssh -d $ip_wan
 ```
 
@@ -79,7 +83,7 @@ follows and example of `/security/dynamic-firewall.json` ( note `/security` fold
 
 follows an example of `/etc/nginx/conf.d/dynfw.conf` file that redirects https traffic coming to https://fw.my.com/dynfw/... towards http://192.168.1.254:5000 ( set [AddUrls](https://github.com/devel0/dynamic-firewall/blob/e3d58ff10819c36908e7ddf773b4d9e1bded6551/dynamic-firewall/Program.cs#L32) to specify listen address )
 
-```
+```conf
 server {
 	listen 443 ssl;
         listen [::]:443 ssl;

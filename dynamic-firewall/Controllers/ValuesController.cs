@@ -23,12 +23,12 @@ namespace dynamic_firewall.Controllers
         {
             try
             {
-                var qt = config.ValidTokens.FirstOrDefault(r => r.Token == token);
-                if (qt == null) return Content($"<h1>invalid access</h1>", "text/html");
-
                 var q = HttpContext.Request.Headers["X-Real-IP"];
                 var url = "";
                 if (q.Count > 0) url = q.First();
+                
+                var qt = config.ValidTokens.FirstOrDefault(r => r.Token == token);
+                if (qt == null) return Content($"<h1>invalid access</h1>ip:{url}", "text/html");                
                 
                 System.Diagnostics.Process.Start("/sbin/ipset", $"add {qt.IPSetName} {url}");
                 System.Console.WriteLine($"added [{url}] to ipset [{qt.IPSetName}]");

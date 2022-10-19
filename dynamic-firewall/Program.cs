@@ -29,7 +29,7 @@ namespace dynamic_firewall
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                //.UseUrls("http://192.168.1.254:5000")
+                .UseUrls("http://10.10.0.1:50000")
                 .UseStartup<Startup>();
     }
 }
